@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: tunilip-backend
+    env: python
+    region: frankfurt   # choisir le plus proche de la Tunisie
+    plan: standard      # minimum 2GB RAM pour VideoMAE (86M params)
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+    # VideoMAE ~350MB à télécharger au démarrage
+    # Premier démarrage ~2-3 min, ensuite ~30s
