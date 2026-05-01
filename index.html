@@ -1054,6 +1054,8 @@ footer {
 ═══════════════════════════════════════════ -->
 <script>
 'use strict';
+   // ═══ URL du backend Render — à changer après déploiement ═══
+const BACKEND_URL = 'https://tunilip-backend.onrender.com';
 
 /* ─── VOCABULARY DATA ───────────────────────────────────────── */
 const WORDS = [
@@ -1512,42 +1514,62 @@ function resetDemo() {
    PREDICTION ENGINE
 ═══════════════════════════════════════════════════════════════ */
 async function runPrediction() {
-  if(!S.videoBlob) {
+  if (!S.videoBlob) {
     toast('⚠️', 'No Video', 'Please upload or record a video first.', true);
     return;
   }
   resetPredUI();
-  $('predEmpty').textContent = '⚙️ Reading video metadata…';
   setPipelineStep(1);
+  $('predEmpty').textContent = '⚙️ Uploading video to server…';
 
-  await delay(700);
-  setPipelineStep(2);
-  $('predEmpty').textContent = '👄 Detecting mouth region…';
-  await delay(800);
+  // ── Étape 1 : envoyer la vidéo → backend → features (8, 768) ──
+  let features;
+  try {
+    setPipelineStep(2);
+    $('predEmpty').textContent = '👄 Extracting VideoMAE features (server)…';
 
+    const formData = new FormData();
+    formData.append('video', S.videoBlob, 'input.mp4');
+
+    const resp = await fetch(`${BACKEND_URL}/extract-features`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json();
+      throw new Error(err.detail || `HTTP ${resp.status}`);
+    }
+
+    const data = await resp.json();
+    features = data.features; // [[f0_0,...,f0_767], ..., [f7_0,...,f7_767]]
+
+  } catch (err) {
+    toast('❌', 'Backend Error', err.message, true);
+    $('predEmpty').textContent = '⚠️ Erreur backend : ' + err.message;
+    setPipelineStep(0);
+    return;
+  }
+
+  // ── Étape 2 : inférence TF.js avec les vraies features ──
   setPipelineStep(3);
-  $('predEmpty').textContent = '🔢 Extracting VideoMAE features (8×768)…';
-  await delay(900);
+  $('predEmpty').textContent = '🔢 Preparing tensor (8×768)…';
+  await delay(200);
 
   setPipelineStep(4);
   $('predEmpty').textContent = '🧠 Running BiLSTM + TemporalAttention…';
-  await delay(500);
 
   let scores;
-  if(S.model) {
+  if (S.model) {
     try {
-      const seed = (S.videoBlob.size || 12345) % 10000;
-      const data = new Float32Array(8 * 768);
-      for(let i = 0; i < data.length; i++) {
-        data[i] = Math.sin(i*0.131 + seed*0.0173)*0.82
-                + Math.cos(i*0.073 + seed*0.0311)*0.41;
-      }
-      const inp = tf.tensor3d(data, [1, 8, 768]);
-      const out = S.model.predict(inp);
-      const raw = await out.data();
-      inp.dispose(); out.dispose();
-      scores = Array.from(raw).map((v, i) => ({idx: i, prob: v}));
-    } catch(err) {
+      const flat = features.flat();              // 8×768 = 6144 valeurs
+      const inp  = tf.tensor3d(flat, [1, 8, 768]);
+      const out  = S.model.predict(inp);
+      const raw  = await out.data();
+      inp.dispose();
+      out.dispose();
+      scores = Array.from(raw).map((v, i) => ({ idx: i, prob: v }));
+    } catch (err) {
       console.error('[TUNILip+] Inference error:', err);
       scores = simulateScores();
     }
