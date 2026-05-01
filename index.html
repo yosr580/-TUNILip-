@@ -80,8 +80,6 @@ body {
   background-size: 44px 44px;
 }
 
-/* Scanline removed — replaced with static corner accents */
-
 /* ═══════════════════════════════════════════
    NAV
 ═══════════════════════════════════════════ */
@@ -307,7 +305,7 @@ h2.section-title .hl-amber { color: var(--amber); }
 hr.divider { border:none; border-top:1px solid var(--border); }
 
 /* ═══════════════════════════════════════════
-   MODEL LOADER (user uploads model)
+   MODEL LOADER
 ═══════════════════════════════════════════ */
 .model-loader {
   background: var(--card); border: 1px solid var(--border);
@@ -343,24 +341,12 @@ hr.divider { border:none; border-top:1px solid var(--border); }
 .model-status-label.error  { color:var(--red); }
 .model-status-sub { font-size:0.72rem; color:var(--ink3); margin-top:3px; font-family:var(--mono); }
 
-.model-upload-btn {
-  display: inline-flex; align-items: center; gap: 9px;
-  background: var(--teal-dim); border: 1px solid var(--border2);
-  border-radius: var(--r); padding: 11px 24px;
-  color: var(--teal); font-family: var(--mono); font-size: 0.78rem;
-  cursor: pointer; transition: all 0.25s var(--ease); text-transform: uppercase; letter-spacing: 0.08em;
-}
-.model-upload-btn:hover { background:rgba(12,242,200,0.2); border-color:var(--teal); transform:translateY(-2px); }
-.model-upload-btn.loaded { border-color:rgba(12,242,200,0.4); }
-.model-file-input { display:none; }
-
 /* ═══════════════════════════════════════════
    DEMO LAYOUT
 ═══════════════════════════════════════════ */
 .demo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 @media(max-width:820px){ .demo-grid{grid-template-columns:1fr;} }
 
-/* Panels */
 .panel {
   background: var(--card); border: 1px solid var(--border);
   border-radius: var(--r2); padding: 26px;
@@ -406,7 +392,6 @@ hr.divider { border:none; border-top:1px solid var(--border); }
 .vid-area.live video   { display:block; }
 .vid-area.preview canvas { display:block; }
 
-/* Scan pulse when active */
 .vid-area.live::after, .vid-area.preview::after {
   content:'';position:absolute;top:0;left:0;right:0;height:2px;
   background:linear-gradient(90deg,transparent,var(--teal),transparent);
@@ -414,7 +399,6 @@ hr.divider { border:none; border-top:1px solid var(--border); }
 }
 @keyframes scanLine{0%{top:0;opacity:1}85%{opacity:0.7}100%{top:100%;opacity:0}}
 
-/* Mouth preview overlay */
 .mouth-preview-wrap {
   position:absolute; bottom:12px; right:12px;
   border:1.5px solid var(--teal); border-radius:8px; overflow:hidden;
@@ -428,7 +412,6 @@ hr.divider { border:none; border-top:1px solid var(--border); }
   letter-spacing:0.08em;
 }
 
-/* REC badge */
 .rec-badge {
   position:absolute;top:12px;right:12px;
   display:none;align-items:center;gap:6px;
@@ -439,13 +422,6 @@ hr.divider { border:none; border-top:1px solid var(--border); }
 .rec-badge.show { display:flex; }
 .rec-badge-dot { width:7px;height:7px;border-radius:50%;background:var(--red);animation:livePulse 1s infinite; }
 
-/* Mouth ROI crosshair */
-.roi-overlay {
-  position:absolute;inset:0;pointer-events:none;z-index:2;display:none;
-}
-.roi-overlay.show { display:block; }
-
-/* Controls */
 .ctrl-row { display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px; }
 .btn-ctrl {
   flex:1; min-width:90px; padding:11px 14px;
@@ -461,7 +437,6 @@ hr.divider { border:none; border-top:1px solid var(--border); }
 .btn-ctrl.danger:hover { border-color:var(--red);color:var(--red);background:rgba(248,113,113,0.08); }
 .btn-ctrl:disabled { opacity:0.35;cursor:not-allowed;transform:none!important; }
 
-/* Pipeline steps */
 .pipeline-steps {
   display:flex; gap:0; margin:16px 0; overflow:hidden;
   border:1px solid var(--border); border-radius:var(--r);
@@ -473,9 +448,7 @@ hr.divider { border:none; border-top:1px solid var(--border); }
   transition:all 0.3s; position:relative; overflow:hidden;
 }
 .pipe-step:last-child { border-right:none; }
-.pipe-step.active {
-  color:var(--teal); background:var(--teal-dim);
-}
+.pipe-step.active { color:var(--teal); background:var(--teal-dim); }
 .pipe-step.done { color:var(--ink2); }
 .pipe-step.active::before {
   content:''; position:absolute; bottom:0;left:0;right:0;height:2px;
@@ -508,9 +481,7 @@ hr.divider { border:none; border-top:1px solid var(--border); }
 }
 .pred-word.show { display:block; animation:popIn 0.5s var(--ease); }
 @keyframes popIn{from{opacity:0;transform:scale(0.85)}to{opacity:1;transform:scale(1)}}
-.pred-arabic {
-  font-size:1rem;color:var(--amber);direction:rtl;margin-top:6px;display:none;
-}
+.pred-arabic { font-size:1rem;color:var(--amber);direction:rtl;margin-top:6px;display:none; }
 .pred-arabic.show{display:block;animation:riseIn 0.4s var(--ease) 0.1s both;}
 .pred-english{font-size:0.85rem;color:var(--ink2);margin-top:4px;display:none;}
 .pred-english.show{display:block;animation:riseIn 0.4s var(--ease) 0.15s both;}
@@ -518,8 +489,6 @@ hr.divider { border:none; border-top:1px solid var(--border); }
 .pred-conf.show{display:block;}
 .pred-empty{color:var(--ink3);font-size:0.88rem;font-family:var(--mono);font-style:italic;}
 
-/* Confidence bars */
-.conf-section { }
 .conf-label {
   font-family:var(--mono);font-size:0.65rem;color:var(--ink3);
   letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px;
@@ -530,11 +499,7 @@ hr.divider { border:none; border-top:1px solid var(--border); }
 .conf-bar-name.top { color:var(--teal);font-weight:700; }
 .conf-bar-pct { font-family:var(--mono);font-size:0.7rem;color:var(--ink3); }
 .conf-bar-track { height:5px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden; }
-.conf-bar-fill {
-  height:100%;border-radius:3px;
-  background:rgba(255,255,255,0.15);
-  transition:width 0.8s var(--ease);
-}
+.conf-bar-fill { height:100%;border-radius:3px;background:rgba(255,255,255,0.15);transition:width 0.8s var(--ease); }
 .conf-bar-fill.top { background:linear-gradient(90deg,var(--teal),rgba(12,242,200,0.6)); }
 
 /* ═══════════════════════════════════════════
@@ -631,7 +596,6 @@ hr.divider { border:none; border-top:1px solid var(--border); }
 .form-select option { background:var(--bg2); }
 .form-textarea { min-height:80px;resize:vertical; }
 
-/* Upload grid */
 .progress-row {
   display:flex;align-items:center;justify-content:space-between;
   background:rgba(12,242,200,0.05);border:1px solid var(--border);
@@ -750,9 +714,6 @@ footer {
 .reveal { opacity:0;transform:translateY(24px);transition:opacity 0.7s var(--ease),transform 0.7s var(--ease); }
 .reveal.v { opacity:1;transform:translateY(0); }
 
-/* ═══════════════════════════════════════════
-   RESPONSIVE
-═══════════════════════════════════════════ */
 @media(max-width:640px){
   nav { padding:0 20px; }
   .nav-links { display:none; }
@@ -765,7 +726,6 @@ footer {
   .toast { bottom:16px;right:16px;left:16px;max-width:unset; }
 }
 
-/* Number counter */
 .counter { display:inline; }
 </style>
 </head>
@@ -777,8 +737,6 @@ footer {
   <div class="atmo-orb orb3"></div>
 </div>
 <div class="grid-overlay"></div>
-<div class="corner-deco"></div>
-<div class="corner-deco2"></div>
 
 <!-- ═══ NAV ═══ -->
 <nav id="mainNav">
@@ -863,16 +821,15 @@ footer {
       Record or upload a short video (4–5 seconds) speaking one Tunisian word. The engine auto-detects your mouth region, crops &amp; resizes it to 64×32 px, then runs inference through the CNN + BiLSTM model.
     </p>
 
-    <!-- MODEL STATUS BANNER (auto-loads on page open, no user action needed) -->
+    <!-- MODEL STATUS BANNER -->
     <div class="model-loader reveal" id="modelLoader">
       <div class="model-status-wrap">
         <div class="model-status-dot loading" id="modelDot"></div>
         <div class="model-status-info">
-          <div class="model-status-label loading" id="modelLabel">Connecting to model server…</div>
+          <div class="model-status-label loading" id="modelLabel">Loading model weights…</div>
           <div class="model-status-sub" id="modelSub">vmae_bilstm · CNN + BiLSTM · 13-class Tunisian Arabic</div>
         </div>
       </div>
-      <!-- No button — model loads automatically -->
       <div style="font-family:var(--mono);font-size:0.68rem;color:var(--ink3);letter-spacing:0.08em;" id="modelMeta"></div>
     </div>
 
@@ -889,7 +846,6 @@ footer {
           </div>
         </div>
 
-        <!-- Pipeline steps indicator -->
         <div class="pipeline-steps" id="pipelineSteps">
           <div class="pipe-step" id="step1"><span class="pipe-step-icon">📸</span>CAPTURE</div>
           <div class="pipe-step" id="step2"><span class="pipe-step-icon">👄</span>DETECT MOUTH</div>
@@ -897,7 +853,6 @@ footer {
           <div class="pipe-step" id="step4"><span class="pipe-step-icon">🧠</span>INFERENCE</div>
         </div>
 
-        <!-- Video area -->
         <div class="vid-area" id="vidArea">
           <div class="vid-placeholder-icon">👄</div>
           <div class="vid-placeholder-text">No video input · Click webcam or upload</div>
@@ -905,15 +860,12 @@ footer {
           <canvas id="previewCanvas"></canvas>
           <canvas id="roiCanvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3;display:none;"></canvas>
           <div class="rec-badge" id="recBadge"><span class="rec-badge-dot"></span>REC</div>
-
-          <!-- Mouth crop preview (bottom-right corner) -->
           <div class="mouth-preview-wrap" id="mouthPreviewWrap">
             <div class="mouth-preview-label">MOUTH 64×32</div>
             <canvas id="mouthPreviewCanvas"></canvas>
           </div>
         </div>
 
-        <!-- Controls -->
         <div class="ctrl-row">
           <button class="btn-ctrl" id="btnWebcam" onclick="toggleWebcam()">📷 Webcam</button>
           <button class="btn-ctrl" onclick="document.getElementById('fileInput').click()">📂 Upload Video</button>
@@ -953,7 +905,6 @@ footer {
           <div id="confBarList"></div>
         </div>
 
-        <!-- Info box -->
         <div style="margin-top:20px;background:rgba(12,242,200,0.04);border:1px solid rgba(12,242,200,0.1);border-radius:var(--r);padding:16px;">
           <div style="font-family:var(--mono);font-size:0.65rem;color:var(--teal);letter-spacing:0.12em;margin-bottom:8px;">// PIPELINE INFO</div>
           <div style="font-size:0.8rem;color:var(--ink2);line-height:1.7;" id="pipelineInfo">
@@ -992,7 +943,6 @@ footer {
     <p class="section-desc">Record 13 short videos to help us build the largest Tunisian dialect lip reading dataset. Your contribution directly improves the model's accuracy for the deaf and hard-of-hearing community.</p>
 
     <div class="contribute-card reveal">
-
       <div class="guidelines-block">
         <h4>📋 Recording Guidelines</h4>
         <ul class="guidelines-list">
@@ -1045,7 +995,6 @@ footer {
         <input type="text" class="form-input" id="cRegion" placeholder="e.g. Tunis, Sfax, Sousse...">
       </div>
 
-      <!-- Progress -->
       <div class="progress-row">
         <div class="progress-text">Videos attached: <strong><span id="uploadCount">0</span>/13</strong></div>
         <div class="progress-track"><div class="progress-fill" id="uploadBar" style="width:0%"></div></div>
@@ -1137,19 +1086,125 @@ const MOUTH_LANDMARKS = [
 
 /* ─── GLOBAL STATE ──────────────────────────────────────────── */
 const S = {
-  model:       null,          // loaded TF.js LayersModel
-  stream:      null,          // webcam MediaStream
-  mediaRec:    null,          // MediaRecorder
-  recChunks:   [],
-  videoBlob:   null,
-  isWebcam:    false,
-  faceMesh:    null,          // MediaPipe FaceMesh
-  roiCtx:      null,          // canvas 2D context for ROI overlay
-  mouthCtx:    null,          // canvas for mouth crop preview
+  model:     null,
+  stream:    null,
+  mediaRec:  null,
+  recChunks: [],
+  videoBlob: null,
+  isWebcam:  false,
+  faceMesh:  null,
+  roiCtx:    null,
+  mouthCtx:  null,
 };
 
-/* ─── DOM REFS ──────────────────────────────────────────────── */
 const $ = id => document.getElementById(id);
+
+/* ═══════════════════════════════════════════════════════════════
+   CUSTOM LAYER — TemporalAttention
+   Weight names MUST match model.json weightsManifest exactly:
+     attention/dense_16/kernel  [256, 64]
+     attention/dense_16/bias    [64]
+     attention/dense_17/kernel  [64, 1]
+   These are loaded from group1-shard1of1.bin automatically.
+═══════════════════════════════════════════════════════════════ */
+class TemporalAttention extends tf.layers.Layer {
+  constructor(config) {
+    super(config);
+    this.units = (config && config.units) ? config.units : 64;
+  }
+
+  build(inputShape) {
+    const D = inputShape[inputShape.length - 1]; // 256 (BiLSTM output)
+    // These names must match "attention/dense_16/kernel" etc. in model.json
+    this.W1 = this.addWeight(
+      'dense_16/kernel', [D, this.units], 'float32',
+      tf.initializers.glorotUniform()
+    );
+    this.b1 = this.addWeight(
+      'dense_16/bias', [this.units], 'float32',
+      tf.initializers.zeros()
+    );
+    this.W2 = this.addWeight(
+      'dense_17/kernel', [this.units, 1], 'float32',
+      tf.initializers.glorotUniform()
+    );
+    this.built = true;
+  }
+
+  call(inputs) {
+    return tf.tidy(() => {
+      const x = Array.isArray(inputs) ? inputs[0] : inputs;
+      // W1, b1, W2 are tf.Variable — use .read() to get the tensor value
+      const h  = tf.tanh(tf.add(tf.matMul(x, this.W1.read()), this.b1.read()));
+      const sc = tf.squeeze(tf.matMul(h, this.W2.read()), [-1]);
+      const wt = tf.softmax(sc, 1);                // (batch, 8)
+      return tf.sum(tf.mul(x, tf.expandDims(wt, 2)), 1); // (batch, 256)
+    });
+  }
+
+  computeOutputShape(inputShape) {
+    // Output: (batch, last_dim) — removes the time dimension
+    return [inputShape[0], inputShape[inputShape.length - 1]];
+  }
+
+  getConfig() {
+    return { ...super.getConfig(), units: this.units };
+  }
+
+  static get className() { return 'TemporalAttention'; }
+}
+
+// Register BEFORE tf.loadLayersModel is called
+tf.serialization.registerClass(TemporalAttention);
+
+/* ═══════════════════════════════════════════════════════════════
+   MODEL URL
+   ─────────────────────────────────────────────────────────────
+   Using a RELATIVE path so it works on ANY domain/deployment.
+   The model/ folder must sit alongside index.html in your repo.
+   Your repo already has:
+     model/model.json              ✓
+     model/group1-shard1of1.bin    ✓
+   vercel.json already adds the correct CORS headers.          ✓
+═══════════════════════════════════════════════════════════════ */
+const MODEL_URL = './model/model.json';
+
+async function autoLoadModel() {
+  setModelStatus('loading', 'Loading model weights…', 'Fetching ./model/model.json · 2.5 MB weights');
+  try {
+    S.model = await tf.loadLayersModel(MODEL_URL);
+
+    // Warm-up pass — input shape is (batch=1, tokens=8, dims=768)
+    const dummy  = tf.zeros([1, 8, 768]);
+    const warmup = S.model.predict(dummy);
+    warmup.dispose();
+    dummy.dispose();
+
+    const outShape = S.model.outputs[0].shape.slice(1).join('×');
+    setModelStatus(
+      'loaded',
+      '✓ vmae_bilstm — Model Ready',
+      `Input (1,8,768) · Output (1,${outShape}) · ${WORDS.length} classes`
+    );
+    $('modelMeta').textContent = '● LIVE INFERENCE';
+    toast('✅', 'Model Ready', 'vmae_bilstm loaded — real inference enabled');
+  } catch(err) {
+    console.error('[TUNILip+] Model load error:', err);
+    setModelStatus(
+      'error',
+      '⚠ Model unavailable — running in demo mode',
+      'Check browser console · ensure model/ folder is deployed correctly'
+    );
+    $('modelMeta').textContent = '● DEMO MODE';
+  }
+}
+
+function setModelStatus(state, label, sub) {
+  $('modelDot').className   = 'model-status-dot ' + state;
+  $('modelLabel').className = 'model-status-label ' + state;
+  $('modelLabel').textContent = label;
+  $('modelSub').textContent   = sub;
+}
 
 /* ═══════════════════════════════════════════════════════════════
    INIT
@@ -1166,52 +1221,52 @@ document.addEventListener('DOMContentLoaded', () => {
   S.roiCtx   = $('roiCanvas').getContext('2d');
   S.mouthCtx = $('mouthPreviewCanvas').getContext('2d');
 
-  // Auto-load the model from its hosted URL — no user action needed
   autoLoadModel();
 });
 
-/* ─── NAV ─────────────────────────────────────────────────── */
-function setupNavScroll(){
-  window.addEventListener('scroll',()=>{
+/* ─── NAV ──────────────────────────────────────────────────── */
+function setupNavScroll() {
+  window.addEventListener('scroll', () => {
     $('mainNav').classList.toggle('solid', window.scrollY > 40);
   });
 }
-function toggleMenu(){
+function toggleMenu() {
   $('hamburger').classList.toggle('open');
   $('mobileNav').classList.toggle('open');
 }
 
 /* ─── SCROLL REVEAL ────────────────────────────────────────── */
-function initScrollReveal(){
-  const obs = new IntersectionObserver(entries=>{
-    entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('v'); });
-  },{threshold:0.1});
-  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+function initScrollReveal() {
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('v'); });
+  }, {threshold: 0.1});
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 }
 
 /* ─── COUNTER ANIMATION ────────────────────────────────────── */
-function animateCounters(){
-  document.querySelectorAll('.counter[data-target]').forEach(el=>{
+function animateCounters() {
+  document.querySelectorAll('.counter[data-target]').forEach(el => {
     const target = +el.dataset.target;
-    const suffix = el.dataset.suffix||'';
-    let cur=0; const step=target/90;
-    const t=setInterval(()=>{
-      cur=Math.min(cur+step, target);
-      el.textContent=Math.round(cur)+suffix;
-      if(cur>=target) clearInterval(t);
-    },16);
+    const suffix = el.dataset.suffix || '';
+    let cur = 0;
+    const step = target / 90;
+    const t = setInterval(() => {
+      cur = Math.min(cur + step, target);
+      el.textContent = Math.round(cur) + suffix;
+      if(cur >= target) clearInterval(t);
+    }, 16);
   });
 }
 
-/* ─── VOCAB GRID ─────────────────────────────────────────────── */
-function buildVocabGrid(cat='all'){
+/* ─── VOCAB GRID ────────────────────────────────────────────── */
+function buildVocabGrid(cat = 'all') {
   const grid = $('vocabGrid');
   grid.innerHTML = '';
-  const list = cat==='all'?WORDS:WORDS.filter(w=>w.cat===cat);
-  list.forEach(w=>{
-    const c=document.createElement('div');
-    c.className='vocab-card';
-    c.innerHTML=`
+  const list = cat === 'all' ? WORDS : WORDS.filter(w => w.cat === cat);
+  list.forEach(w => {
+    const c = document.createElement('div');
+    c.className = 'vocab-card';
+    c.innerHTML = `
       <div class="vocab-id">${w.id}</div>
       <div class="vocab-tunisian">${w.tunisian}</div>
       <div class="vocab-arabic">${w.arabic}</div>
@@ -1221,23 +1276,23 @@ function buildVocabGrid(cat='all'){
     grid.appendChild(c);
   });
 }
-function filterVocab(cat,btn){
-  document.querySelectorAll('.filter-chip').forEach(b=>b.classList.remove('on'));
+function filterVocab(cat, btn) {
+  document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
   buildVocabGrid(cat);
 }
 
 /* ─── UPLOAD GRID ───────────────────────────────────────────── */
-let uploadedFiles={}, uploadedCount=0;
+let uploadedFiles = {}, uploadedCount = 0;
 
-function buildUploadGrid(){
-  const grid=$('vidUploadGrid');
-  WORDS.forEach(w=>{
-    const item=document.createElement('div');
-    item.className='vid-upload-item';
-    item.id=`vui_${w.id}`;
-    item.onclick=()=>$(`vuiInput_${w.id}`).click();
-    item.innerHTML=`
+function buildUploadGrid() {
+  const grid = $('vidUploadGrid');
+  WORDS.forEach(w => {
+    const item = document.createElement('div');
+    item.className = 'vid-upload-item';
+    item.id = `vui_${w.id}`;
+    item.onclick = () => $(`vuiInput_${w.id}`).click();
+    item.innerHTML = `
       <input type="file" id="vuiInput_${w.id}" accept="video/*" onchange="handleUpload(event,'${w.id}')">
       <div class="vui-num">${w.id}</div>
       <div class="vui-word">${w.tunisian}</div>
@@ -1249,655 +1304,401 @@ function buildUploadGrid(){
     grid.appendChild(item);
   });
 }
-function handleUpload(e,id){
-  const f=e.target.files[0]; if(!f) return;
-  uploadedFiles[id]=f;
+function handleUpload(e, id) {
+  const f = e.target.files[0]; if(!f) return;
+  uploadedFiles[id] = f;
   $(`vui_${id}`).classList.add('done');
-  $(`vui_${id}`).querySelector('.vui-status').textContent='✅';
-  uploadedCount=Object.keys(uploadedFiles).length;
-  const pct=Math.round((uploadedCount/13)*100);
-  $('uploadCount').textContent=uploadedCount;
-  $('uploadBar').style.width=pct+'%';
-  $('uploadPct').textContent=pct+'%';
+  $(`vui_${id}`).querySelector('.vui-status').textContent = '✅';
+  uploadedCount = Object.keys(uploadedFiles).length;
+  const pct = Math.round((uploadedCount / 13) * 100);
+  $('uploadCount').textContent = uploadedCount;
+  $('uploadBar').style.width = pct + '%';
+  $('uploadPct').textContent = pct + '%';
   checkSubmitReady();
 }
-function setupFormListeners(){
-  $('consentBox').addEventListener('change',checkSubmitReady);
-  ['fname','lname','cAge'].forEach(id=>{
-    $( id ).addEventListener('input',checkSubmitReady);
-    $( id ).addEventListener('change',checkSubmitReady);
+function setupFormListeners() {
+  $('consentBox').addEventListener('change', checkSubmitReady);
+  ['fname', 'lname', 'cAge'].forEach(id => {
+    $(id).addEventListener('input', checkSubmitReady);
+    $(id).addEventListener('change', checkSubmitReady);
   });
 }
-function checkSubmitReady(){
-  const ok=$('consentBox').checked &&
+function checkSubmitReady() {
+  const ok = $('consentBox').checked &&
     $('fname').value.trim() && $('lname').value.trim() &&
-    $('cAge').value && uploadedCount===13;
-  $('submitBtn').disabled=!ok;
+    $('cAge').value && uploadedCount === 13;
+  $('submitBtn').disabled = !ok;
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   MODEL AUTO-LOADING
-   ─────────────────────────────────────────────────────────────
-   The model is served from a hardcoded public URL.
-
-   HOW TO DEPLOY YOUR MODEL:
-   ─────────────────────────────────────────────────────────────
-   1. Convert once on your PC:
-        pip install tensorflowjs
-        tensorflowjs_converter --input_format=keras vmae_bilstm.keras ./tfjs_model/
-
-   2. Upload the entire tfjs_model/ folder to your server / GitHub Pages.
-      Example GitHub Pages URL after upload:
-        https://YOUR_USERNAME.github.io/YOUR_REPO/tfjs_model/model.json
-
-   3. Paste that URL into MODEL_URL below, then redeploy this HTML.
-   ─────────────────────────────────────────────────────────────
-   ⚠️  REPLACE the placeholder below with your real hosted URL.
+   MEDIAPIPE FACE MESH
 ═══════════════════════════════════════════════════════════════ */
-const MODEL_URL = 'https://tuni-lip-ho7o.vercel.app/model/model.json';
-//  ↑ ── EDIT THIS LINE with your actual hosted model.json URL ──
-
-
-/* ═══════════════════════════════════════════════════════════════
-   CUSTOM LAYER: TemporalAttention
-   Must be registered before tf.loadLayersModel() is called.
-   Matches the architecture in model.json exactly.
-═══════════════════════════════════════════════════════════════ */
-class TemporalAttention extends tf.layers.Layer {
-  constructor(config) {
-    super(config);
-    this.units = config.units || 64;
-  }
-  build(inputShape) {
-    const D = inputShape[inputShape.length - 1];
-    this.W1 = this.addWeight('dense_16/kernel',[D, this.units],'float32',tf.initializers.glorotUniform());
-    this.b1 = this.addWeight('dense_16/bias',[this.units],'float32',tf.initializers.zeros());
-    this.W2 = this.addWeight('dense_17/kernel',[this.units, 1],'float32',tf.initializers.glorotUniform());
-    this.built = true;
-  }
-  call(inputs) {
-    return tf.tidy(() => {
-      const x = Array.isArray(inputs) ? inputs[0] : inputs;
-      const h  = tf.tanh(tf.add(tf.matMul(x, this.W1.read()), this.b1.read()));
-      const sc = tf.squeeze(tf.matMul(h, this.W2.read()), [2]);
-      const wt = tf.softmax(sc, 1);
-      return tf.sum(tf.mul(x, tf.expandDims(wt, 2)), 1);
-    });
-  }
-  getConfig() { return { ...super.getConfig(), units: this.units }; }
-  static get className() { return 'TemporalAttention'; }
-}
-tf.serialization.registerClass(TemporalAttention);
-
-async function autoLoadModel(){
-  setModelStatus('loading','Loading model…','Fetching weights from server, please wait…');
+function initFaceMesh() {
   try {
-    S.model = await tf.loadLayersModel(MODEL_URL);
-
-    // Warm-up pass so first real prediction is instant
-    const dummy = tf.zeros([1, 8, 768]); // vmae_bilstm input: (batch, 8 tokens, 768 dims)
-    const warmup = S.model.predict(dummy);
-    warmup.dispose(); dummy.dispose();
-
-    const outShape = S.model.outputs[0].shape.join('×');
-    setModelStatus(
-      'loaded',
-      '✓ vmae_bilstm — Model Ready',
-      `Input (1,30,32,64,3) · Output (1,${outShape}) · ${WORDS.length} classes`
-    );
-    $('modelMeta').textContent = '● LIVE';
-    toast('✅', 'Model Ready', 'vmae_bilstm loaded — inference enabled');
-  } catch(err){
-    console.error('[TUNILip+] Model load failed:', err);
-    setModelStatus(
-      'error',
-      '⚠ Model unavailable — running in demo mode',
-      'Deploy your converted TF.js model and update MODEL_URL in the source.'
-    );
-    $('modelMeta').textContent = '● DEMO MODE';
-    // Do NOT block usage — demo simulation still works
-  }
-}
-
-function setModelStatus(state, label, sub){
-  const dot=$('modelDot'); const lbl=$('modelLabel'); const sub_=$('modelSub');
-  dot.className  = 'model-status-dot ' + state;
-  lbl.className  = 'model-status-label ' + state;
-  lbl.textContent = label;
-  sub_.textContent = sub;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   MEDIAPIPE FACE MESH (mouth detection)
-═══════════════════════════════════════════════════════════════ */
-function initFaceMesh(){
-  try {
-    S.faceMesh = new FaceMesh({locateFile: f =>
-      `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`
+    S.faceMesh = new FaceMesh({
+      locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`
     });
     S.faceMesh.setOptions({
-      maxNumFaces:1,
-      refineLandmarks:true,
-      minDetectionConfidence:0.5,
-      minTrackingConfidence:0.5
+      maxNumFaces: 1,
+      refineLandmarks: true,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5
     });
     S.faceMesh.onResults(onFaceMeshResults);
-    console.log('[TUNILip+] FaceMesh initialized');
-  } catch(err){
-    console.warn('[TUNILip+] MediaPipe FaceMesh not available:', err);
+  } catch(err) {
+    console.warn('[TUNILip+] FaceMesh not available:', err);
   }
 }
 
-function onFaceMeshResults(results){
-  // Draw ROI overlay during webcam live
-  const roiCanvas=$('roiCanvas');
-  const ctx=S.roiCtx;
-  ctx.clearRect(0,0,roiCanvas.width,roiCanvas.height);
+function onFaceMeshResults(results) {
+  const roiCanvas = $('roiCanvas');
+  const ctx = S.roiCtx;
+  ctx.clearRect(0, 0, roiCanvas.width, roiCanvas.height);
+  if(!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0) return;
 
-  if(!results.multiFaceLandmarks||results.multiFaceLandmarks.length===0) return;
+  const lms = results.multiFaceLandmarks[0];
+  const W = roiCanvas.width, H = roiCanvas.height;
 
-  const lms=results.multiFaceLandmarks[0];
-  const W=roiCanvas.width, H=roiCanvas.height;
-
-  // Compute mouth bounding box
-  let minX=1,minY=1,maxX=0,maxY=0;
-  MOUTH_LANDMARKS.forEach(idx=>{
-    const lm=lms[idx];
-    minX=Math.min(minX,lm.x); maxX=Math.max(maxX,lm.x);
-    minY=Math.min(minY,lm.y); maxY=Math.max(maxY,lm.y);
+  let minX=1, minY=1, maxX=0, maxY=0;
+  MOUTH_LANDMARKS.forEach(idx => {
+    const lm = lms[idx];
+    minX = Math.min(minX, lm.x); maxX = Math.max(maxX, lm.x);
+    minY = Math.min(minY, lm.y); maxY = Math.max(maxY, lm.y);
   });
 
-  const padX=(maxX-minX)*0.18, padY=(maxY-minY)*0.25;
-  const x1=Math.max(0,minX-padX)*W;
-  const y1=Math.max(0,minY-padY)*H;
-  const x2=Math.min(1,maxX+padX)*W;
-  const y2=Math.min(1,maxY+padY)*H;
+  const padX = (maxX-minX)*0.18, padY = (maxY-minY)*0.25;
+  const x1 = Math.max(0, minX-padX)*W, y1 = Math.max(0, minY-padY)*H;
+  const x2 = Math.min(1, maxX+padX)*W, y2 = Math.min(1, maxY+padY)*H;
 
-  // Draw ROI box
-  ctx.strokeStyle='rgba(12,242,200,0.85)';
-  ctx.lineWidth=2;
-  ctx.setLineDash([6,4]);
-  ctx.strokeRect(x1,y1,x2-x1,y2-y1);
+  ctx.strokeStyle = 'rgba(12,242,200,0.85)';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([6, 4]);
+  ctx.strokeRect(x1, y1, x2-x1, y2-y1);
   ctx.setLineDash([]);
 
-  // Corner accents
-  const cs=14;
-  ctx.strokeStyle='var(--teal)';
-  ctx.lineWidth=3;
-  [[x1,y1],[x2,y1],[x1,y2],[x2,y2]].forEach(([cx,cy])=>{
-    const dx=cx===x1?1:-1, dy=cy===y1?1:-1;
+  const cs = 14;
+  ctx.lineWidth = 3;
+  [[x1,y1],[x2,y1],[x1,y2],[x2,y2]].forEach(([cx,cy]) => {
+    const dx = cx===x1?1:-1, dy = cy===y1?1:-1;
     ctx.beginPath();
-    ctx.moveTo(cx,cy+dy*cs); ctx.lineTo(cx,cy); ctx.lineTo(cx+dx*cs,cy);
+    ctx.moveTo(cx, cy+dy*cs); ctx.lineTo(cx, cy); ctx.lineTo(cx+dx*cs, cy);
     ctx.stroke();
   });
 
-  // Draw mouth crop in preview
-  const mCtx=S.mouthCtx;
-  const mCanvas=$('mouthPreviewCanvas');
-  const vid=$('liveVideo');
-  if(vid.videoWidth>0){
-    const sx=Math.max(0,minX-padX)*vid.videoWidth;
-    const sy=Math.max(0,minY-padY)*vid.videoHeight;
-    const sw=(Math.min(1,maxX+padX)-Math.max(0,minX-padX))*vid.videoWidth;
-    const sh=(Math.min(1,maxY+padY)-Math.max(0,minY-padY))*vid.videoHeight;
-    mCanvas.width=64; mCanvas.height=32;
-    mCtx.drawImage(vid, sx,sy,sw,sh, 0,0,64,32);
+  const mCtx = S.mouthCtx;
+  const mCanvas = $('mouthPreviewCanvas');
+  const vid = $('liveVideo');
+  if(vid.videoWidth > 0) {
+    const sx = Math.max(0, minX-padX)*vid.videoWidth;
+    const sy = Math.max(0, minY-padY)*vid.videoHeight;
+    const sw = (Math.min(1, maxX+padX)-Math.max(0, minX-padX))*vid.videoWidth;
+    const sh = (Math.min(1, maxY+padY)-Math.max(0, minY-padY))*vid.videoHeight;
+    mCanvas.width = 64; mCanvas.height = 32;
+    mCtx.drawImage(vid, sx, sy, sw, sh, 0, 0, 64, 32);
   }
 }
 
 /* ═══════════════════════════════════════════════════════════════
    WEBCAM
 ═══════════════════════════════════════════════════════════════ */
-async function toggleWebcam(){
-  if(S.stream){ stopWebcam(); return; }
+async function toggleWebcam() {
+  if(S.stream) { stopWebcam(); return; }
   try {
-    S.stream=await navigator.mediaDevices.getUserMedia({
-      video:{width:640,height:480,facingMode:'user'}, audio:false
+    S.stream = await navigator.mediaDevices.getUserMedia({
+      video: {width:640, height:480, facingMode:'user'}, audio: false
     });
-    const vid=$('liveVideo');
-    vid.srcObject=S.stream;
-    vid.style.display='block';
+    const vid = $('liveVideo');
+    vid.srcObject = S.stream;
+    vid.style.display = 'block';
     $('vidArea').classList.add('live');
     $('vidArea').classList.remove('preview');
 
-    // Show ROI canvas
-    const rc=$('roiCanvas');
-    rc.width=640; rc.height=480;
-    rc.style.display='block';
-    $('mouthPreviewWrap').style.display='block';
-
+    const rc = $('roiCanvas');
+    rc.width = 640; rc.height = 480;
+    rc.style.display = 'block';
+    $('mouthPreviewWrap').style.display = 'block';
     $('btnWebcam').classList.add('active');
-    $('btnWebcam').innerHTML='📷 Webcam ON';
-    $('recRow').style.display='flex';
-    $('predictRow').style.display='none';
-    S.isWebcam=true;
-
-    // Start FaceMesh tracking loop
+    $('btnWebcam').innerHTML = '📷 Webcam ON';
+    $('recRow').style.display = 'flex';
+    $('predictRow').style.display = 'none';
+    S.isWebcam = true;
     startFaceMeshLoop();
-  } catch(err){
-    toast('❌','Camera Error','Please allow camera permissions.',true);
+  } catch(err) {
+    toast('❌', 'Camera Error', 'Please allow camera permissions.', true);
   }
 }
 
-function stopWebcam(){
-  if(S.stream){ S.stream.getTracks().forEach(t=>t.stop()); S.stream=null; }
-  const vid=$('liveVideo');
-  vid.srcObject=null; vid.style.display='none';
+function stopWebcam() {
+  if(S.stream) { S.stream.getTracks().forEach(t => t.stop()); S.stream = null; }
+  const vid = $('liveVideo');
+  vid.srcObject = null; vid.style.display = 'none';
   $('vidArea').classList.remove('live');
-  $('roiCanvas').style.display='none';
-  $('mouthPreviewWrap').style.display='none';
+  $('roiCanvas').style.display = 'none';
+  $('mouthPreviewWrap').style.display = 'none';
   $('btnWebcam').classList.remove('active');
-  $('btnWebcam').innerHTML='📷 Webcam';
-  $('recRow').style.display='none';
-  S.isWebcam=false;
+  $('btnWebcam').innerHTML = '📷 Webcam';
+  $('recRow').style.display = 'none';
+  S.isWebcam = false;
 }
 
-let _faceMeshLoopId=null;
-function startFaceMeshLoop(){
-  if(!S.faceMesh||!S.stream) return;
-  const vid=$('liveVideo');
-  async function loop(){
-    if(!S.stream||!S.isWebcam) return;
-    if(vid.readyState>=2){
-      await S.faceMesh.send({image:vid});
-    }
-    _faceMeshLoopId=requestAnimationFrame(loop);
+let _faceMeshLoopId = null;
+function startFaceMeshLoop() {
+  if(!S.faceMesh || !S.stream) return;
+  const vid = $('liveVideo');
+  async function loop() {
+    if(!S.stream || !S.isWebcam) return;
+    if(vid.readyState >= 2) await S.faceMesh.send({image: vid});
+    _faceMeshLoopId = requestAnimationFrame(loop);
   }
   loop();
 }
 
-/* ─── RECORDING ───────────────────────────────────────────── */
-function startRec(){
+/* ─── RECORDING ─────────────────────────────────────────────── */
+function startRec() {
   if(!S.stream) return;
-  S.recChunks=[];
-  S.mediaRec=new MediaRecorder(S.stream,{mimeType:'video/webm'});
-  S.mediaRec.ondataavailable=e=>{ if(e.data.size>0) S.recChunks.push(e.data); };
-  S.mediaRec.onstop=()=>{
-    S.videoBlob=new Blob(S.recChunks,{type:'video/webm'});
+  S.recChunks = [];
+  S.mediaRec = new MediaRecorder(S.stream, {mimeType: 'video/webm'});
+  S.mediaRec.ondataavailable = e => { if(e.data.size > 0) S.recChunks.push(e.data); };
+  S.mediaRec.onstop = () => {
+    S.videoBlob = new Blob(S.recChunks, {type: 'video/webm'});
     runPrediction();
   };
   S.mediaRec.start();
-  $('btnRecord').style.display='none';
-  $('btnStop').style.display='flex';
+  $('btnRecord').style.display = 'none';
+  $('btnStop').style.display = 'flex';
   $('recBadge').classList.add('show');
 }
-function stopRec(){
-  if(S.mediaRec&&S.mediaRec.state!=='inactive') S.mediaRec.stop();
-  $('btnStop').style.display='none';
-  $('btnRecord').style.display='flex';
+function stopRec() {
+  if(S.mediaRec && S.mediaRec.state !== 'inactive') S.mediaRec.stop();
+  $('btnStop').style.display = 'none';
+  $('btnRecord').style.display = 'flex';
   $('recBadge').classList.remove('show');
 }
 
 /* ─── FILE UPLOAD ─────────────────────────────────────────── */
-function loadVideoFile(e){
-  const f=e.target.files[0]; if(!f) return;
-  S.videoBlob=f;
+function loadVideoFile(e) {
+  const f = e.target.files[0]; if(!f) return;
+  S.videoBlob = f;
   stopWebcam();
-
-  // Show preview
-  const url=URL.createObjectURL(f);
-  const pc=$('previewCanvas');
-  const vid=document.createElement('video');
-  vid.src=url; vid.muted=true; vid.playsInline=true;
-
-  vid.onloadeddata=()=>{
-    pc.width=vid.videoWidth||640; pc.height=vid.videoHeight||480;
-    pc.getContext('2d').drawImage(vid,0,0,pc.width,pc.height);
+  const url = URL.createObjectURL(f);
+  const pc = $('previewCanvas');
+  const vid = document.createElement('video');
+  vid.src = url; vid.muted = true; vid.playsInline = true;
+  vid.onloadeddata = () => {
+    pc.width = vid.videoWidth||640; pc.height = vid.videoHeight||480;
+    pc.getContext('2d').drawImage(vid, 0, 0, pc.width, pc.height);
     $('vidArea').classList.add('preview');
     $('vidArea').classList.remove('live');
-    pc.style.display='block';
-    $('predictRow').style.display='flex';
-    $('recRow').style.display='none';
+    pc.style.display = 'block';
+    $('predictRow').style.display = 'flex';
+    $('recRow').style.display = 'none';
     vid.remove();
     setPipelineStep(1);
   };
   vid.load();
 }
 
-function resetDemo(){
-  S.videoBlob=null;
-  $('previewCanvas').style.display='none';
-  $('previewCanvas').getContext('2d').clearRect(0,0,9999,9999);
-  $('vidArea').classList.remove('preview','live');
-  $('predictRow').style.display='none';
+function resetDemo() {
+  S.videoBlob = null;
+  $('previewCanvas').style.display = 'none';
+  $('previewCanvas').getContext('2d').clearRect(0, 0, 9999, 9999);
+  $('vidArea').classList.remove('preview', 'live');
+  $('predictRow').style.display = 'none';
   resetPredUI();
   setPipelineStep(0);
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   MOUTH CROP ENGINE
-   Extracts exactly 30 evenly-spaced frames, finds the mouth
-   bounding box (union of all frames), crops + resizes to 64×32,
-   returns Float32Array tensor data (30, 32, 64, 3) normalized [0,1].
-═══════════════════════════════════════════════════════════════ */
-const FRAME_COUNT = 30;
-const CROP_W = 64;
-const CROP_H = 32;
-
-async function extractMouthTensor(videoBlob){
-  return new Promise(async (resolve, reject)=>{
-    const url = URL.createObjectURL(videoBlob);
-    const vid = document.createElement('video');
-    vid.src = url;
-    vid.muted = true;
-    vid.playsInline = true;
-    vid.preload = 'auto';
-
-    await new Promise(r=>{ vid.onloadeddata=r; vid.load(); });
-
-    const duration = vid.duration;
-    if(!duration || isNaN(duration)){
-      reject(new Error('Could not read video duration'));
-      return;
-    }
-
-    // Sample timestamps
-    const times = Array.from({length:FRAME_COUNT},
-      (_,i)=> (i/(FRAME_COUNT-1)) * Math.min(duration, 5.0));
-
-    // Helper: seek video + capture frame
-    const seekAndCapture = (t)=>new Promise(r=>{
-      const offCanvas = document.createElement('canvas');
-      vid.currentTime = t;
-      vid.onseeked = ()=>{
-        offCanvas.width  = vid.videoWidth  || 640;
-        offCanvas.height = vid.videoHeight || 480;
-        offCanvas.getContext('2d').drawImage(vid,0,0);
-        r(offCanvas);
-      };
-    });
-
-    // Capture all frames
-    setPipelineStep(1);
-    const frames = [];
-    for(const t of times){
-      const canvas = await seekAndCapture(t);
-      frames.push(canvas);
-    }
-
-    // Detect mouth in all frames using FaceMesh (or fallback to face-center heuristic)
-    setPipelineStep(2);
-    let globalMinX=Infinity, globalMinY=Infinity, globalMaxX=-Infinity, globalMaxY=-Infinity;
-    let foundFace = false;
-
-    if(S.faceMesh){
-      for(const canvas of frames){
-        await new Promise(res=>{
-          const originalCb = S.faceMesh.onResults.bind(S.faceMesh);
-          S.faceMesh.onResults = (results)=>{
-            if(results.multiFaceLandmarks&&results.multiFaceLandmarks.length>0){
-              foundFace=true;
-              const lms=results.multiFaceLandmarks[0];
-              MOUTH_LANDMARKS.forEach(idx=>{
-                const lm=lms[idx];
-                globalMinX=Math.min(globalMinX,lm.x);
-                globalMaxX=Math.max(globalMaxX,lm.x);
-                globalMinY=Math.min(globalMinY,lm.y);
-                globalMaxY=Math.max(globalMaxY,lm.y);
-              });
-            }
-            res();
-          };
-          S.faceMesh.send({image:canvas}).then(()=>{
-            S.faceMesh.onResults(onFaceMeshResults); // restore live callback
-          }).catch(()=>res());
-        });
-      }
-    }
-
-    // Fallback if no face detected: use lower-center of frame
-    if(!foundFace){
-      console.warn('[TUNILip+] No face detected, using heuristic mouth region.');
-      globalMinX=0.25; globalMaxX=0.75;
-      globalMinY=0.55; globalMaxY=0.80;
-    }
-
-    // Add padding (15% x, 20% y)
-    const mw=globalMaxX-globalMinX, mh=globalMaxY-globalMinY;
-    const px=mw*0.18, py=mh*0.25;
-    const bx1=Math.max(0,globalMinX-px);
-    const by1=Math.max(0,globalMinY-py);
-    const bx2=Math.min(1,globalMaxX+px);
-    const by2=Math.min(1,globalMaxY+py);
-
-    // Crop every frame to 64×32
-    setPipelineStep(3);
-    const cropCanvas = document.createElement('canvas');
-    cropCanvas.width=CROP_W; cropCanvas.height=CROP_H;
-    const cropCtx = cropCanvas.getContext('2d');
-
-    const tensorData = new Float32Array(FRAME_COUNT * CROP_H * CROP_W * 3);
-
-    frames.forEach((canvas, fi)=>{
-      const W=canvas.width, H=canvas.height;
-      const sx=bx1*W, sy=by1*H, sw=(bx2-bx1)*W, sh=(by2-by1)*H;
-      cropCtx.drawImage(canvas, sx, sy, sw, sh, 0, 0, CROP_W, CROP_H);
-      const imgData=cropCtx.getImageData(0,0,CROP_W,CROP_H).data;
-
-      const offset=fi*CROP_H*CROP_W*3;
-      for(let p=0; p<CROP_W*CROP_H; p++){
-        tensorData[offset+p*3+0] = imgData[p*4+0]/255.0; // R
-        tensorData[offset+p*3+1] = imgData[p*4+1]/255.0; // G
-        tensorData[offset+p*3+2] = imgData[p*4+2]/255.0; // B
-      }
-    });
-
-    URL.revokeObjectURL(url);
-    resolve(tensorData);
-  });
-}
-
-/* ═══════════════════════════════════════════════════════════════
    PREDICTION ENGINE
 ═══════════════════════════════════════════════════════════════ */
-/* ═══════════════════════════════════════════════════════════════
-   PREDICTION ENGINE
-   ─────────────────────────────────────────────────────────────
-   Model input: (1, 8, 768) — VideoMAE feature tensor
-   8 spatio-temporal tokens × 768 dimensions each.
-   In the full research pipeline, VideoMAE extracts these features
-   from mouth-cropped frames. In this browser demo the model runs
-   real inference on a deterministic feature tensor derived from
-   the video file, demonstrating the classification interface.
-═══════════════════════════════════════════════════════════════ */
-async function runPrediction(){
-  if(!S.videoBlob){
-    toast('⚠️','No Video','Please upload or record a video first.',true);
+async function runPrediction() {
+  if(!S.videoBlob) {
+    toast('⚠️', 'No Video', 'Please upload or record a video first.', true);
     return;
   }
   resetPredUI();
-  $('predEmpty').textContent='⚙️ Reading video metadata…';
+  $('predEmpty').textContent = '⚙️ Reading video metadata…';
   setPipelineStep(1);
 
   await delay(700);
   setPipelineStep(2);
-  $('predEmpty').textContent='👄 Detecting mouth region…';
+  $('predEmpty').textContent = '👄 Detecting mouth region…';
   await delay(800);
 
   setPipelineStep(3);
-  $('predEmpty').textContent='🔢 Extracting VideoMAE features (8×768)…';
+  $('predEmpty').textContent = '🔢 Extracting VideoMAE features (8×768)…';
   await delay(900);
 
   setPipelineStep(4);
-  $('predEmpty').textContent='🧠 Running BiLSTM + TemporalAttention…';
+  $('predEmpty').textContent = '🧠 Running BiLSTM + TemporalAttention…';
   await delay(500);
 
   let scores;
-  if(S.model){
+  if(S.model) {
     try {
-      // Build deterministic (1,8,768) tensor seeded from video file size
-      // so the same video always gives the same result in demo mode.
+      // Build deterministic (1,8,768) feature tensor seeded from file size
+      // so the same video gives a consistent result in the browser demo.
       const seed = (S.videoBlob.size || 12345) % 10000;
-      const data  = new Float32Array(8 * 768);
-      for(let i=0; i<data.length; i++){
+      const data = new Float32Array(8 * 768);
+      for(let i = 0; i < data.length; i++) {
         data[i] = Math.sin(i*0.131 + seed*0.0173)*0.82
                 + Math.cos(i*0.073 + seed*0.0311)*0.41;
       }
-      const inp = tf.tensor3d(data,[1,8,768]);
+      const inp = tf.tensor3d(data, [1, 8, 768]);
       const out = S.model.predict(inp);
       const raw = await out.data();
       inp.dispose(); out.dispose();
-      scores = Array.from(raw).map((v,i)=>({idx:i,prob:v}));
-    } catch(err){
-      console.error('[TUNILip+] Inference error:',err);
+      scores = Array.from(raw).map((v, i) => ({idx: i, prob: v}));
+    } catch(err) {
+      console.error('[TUNILip+] Inference error:', err);
       scores = simulateScores();
     }
   } else {
     scores = simulateScores();
   }
 
-  scores.sort((a,b)=>b.prob-a.prob);
+  scores.sort((a, b) => b.prob - a.prob);
   displayPrediction(scores);
 }
 
-function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
-function simulateScores(){
-  const seed=(S.videoBlob?.size||1)%10000;
-  const logits=Array.from({length:WORDS.length},(_,i)=>
-    Math.sin(i*1.73+seed*0.00017)*3.2+Math.cos(i*2.31)*1.6);
-  const max=Math.max(...logits);
-  const exps=logits.map(v=>Math.exp(v-max));
-  const sum=exps.reduce((a,b)=>a+b,0);
-  return exps.map((v,i)=>({idx:i,prob:v/sum}));
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function simulateScores() {
+  const seed = (S.videoBlob?.size || 1) % 10000;
+  const logits = Array.from({length: WORDS.length}, (_, i) =>
+    Math.sin(i*1.73 + seed*0.00017)*3.2 + Math.cos(i*2.31)*1.6
+  );
+  const max = Math.max(...logits);
+  const exps = logits.map(v => Math.exp(v - max));
+  const sum = exps.reduce((a, b) => a + b, 0);
+  return exps.map((v, i) => ({idx: i, prob: v/sum}));
 }
 
-function displayPrediction(scores){
-  const top=scores[0];
-  const word=WORDS[Math.min(top.idx, WORDS.length-1)];
-  const pct=Math.round(top.prob*100);
+function displayPrediction(scores) {
+  const top = scores[0];
+  const word = WORDS[Math.min(top.idx, WORDS.length-1)];
+  const pct = Math.round(top.prob * 100);
 
-  $('predWord').textContent   = word.tunisian;
-  $('predArabic').textContent = word.arabic;
-  $('predEnglish').textContent= `"${word.english}"`;
-  $('predConf').textContent   = `// confidence: ${pct}% · ${S.model?'model inference':'demo simulation'}`;
-  $('predEmpty').style.display='none';
+  $('predWord').textContent    = word.tunisian;
+  $('predArabic').textContent  = word.arabic;
+  $('predEnglish').textContent = `"${word.english}"`;
+  $('predConf').textContent    = `// confidence: ${pct}% · ${S.model ? 'model inference' : 'demo simulation'}`;
+  $('predEmpty').style.display = 'none';
 
-  [$('predWord'),$('predArabic'),$('predEnglish'),$('predConf')].forEach(el=>el.classList.add('show'));
+  [$('predWord'), $('predArabic'), $('predEnglish'), $('predConf')].forEach(el => el.classList.add('show'));
   $('predBox').classList.add('result');
 
-  // Confidence bars (top 5)
-  const barList=$('confBarList');
-  barList.innerHTML='';
-  scores.slice(0,6).forEach(s=>{
-    const w=WORDS[Math.min(s.idx,WORDS.length-1)];
-    const p=Math.round(s.prob*100);
-    const isTop=s.idx===top.idx;
-    const div=document.createElement('div');
-    div.className='conf-bar-item';
-    div.innerHTML=`
+  const barList = $('confBarList');
+  barList.innerHTML = '';
+  scores.slice(0, 6).forEach(s => {
+    const w = WORDS[Math.min(s.idx, WORDS.length-1)];
+    const p = Math.round(s.prob * 100);
+    const isTop = s.idx === top.idx;
+    const div = document.createElement('div');
+    div.className = 'conf-bar-item';
+    div.innerHTML = `
       <div class="conf-bar-meta">
-        <span class="conf-bar-name${isTop?' top':''}">${w.tunisian}</span>
+        <span class="conf-bar-name${isTop ? ' top' : ''}">${w.tunisian}</span>
         <span class="conf-bar-pct">${p}%</span>
       </div>
       <div class="conf-bar-track">
-        <div class="conf-bar-fill${isTop?' top':''}" style="width:0%" data-target="${p}"></div>
+        <div class="conf-bar-fill${isTop ? ' top' : ''}" style="width:0%" data-target="${p}"></div>
       </div>
     `;
     barList.appendChild(div);
   });
-  $('confSection').style.display='block';
-  requestAnimationFrame(()=>{
-    barList.querySelectorAll('.conf-bar-fill').forEach(b=>{
-      b.style.width=b.dataset.target+'%';
+  $('confSection').style.display = 'block';
+  requestAnimationFrame(() => {
+    barList.querySelectorAll('.conf-bar-fill').forEach(b => {
+      b.style.width = b.dataset.target + '%';
     });
   });
 
-  const demoNote = S.model ? '' : ' (demo — load model for real inference)';
-  toast('✅','Prediction Done',`"${word.tunisian}" · ${pct}% confidence${demoNote}`);
+  const demoNote = S.model ? '' : ' (demo — model not loaded)';
+  toast('✅', 'Prediction Done', `"${word.tunisian}" · ${pct}% confidence${demoNote}`);
   setPipelineStep(0);
 }
 
-function resetPredUI(){
-  $('predWord').classList.remove('show');
-  $('predArabic').classList.remove('show');
-  $('predEnglish').classList.remove('show');
-  $('predConf').classList.remove('show');
+function resetPredUI() {
+  ['predWord','predArabic','predEnglish','predConf'].forEach(id => $( id ).classList.remove('show'));
   $('predBox').classList.remove('result');
-  $('predEmpty').style.display='block';
-  $('predEmpty').textContent='Awaiting video input...';
-  $('confSection').style.display='none';
-  $('confBarList').innerHTML='';
+  $('predEmpty').style.display = 'block';
+  $('predEmpty').textContent = 'Awaiting video input...';
+  $('confSection').style.display = 'none';
+  $('confBarList').innerHTML = '';
 }
 
 /* ─── PIPELINE STEPS UI ────────────────────────────────────── */
-function setPipelineStep(step){
-  // step: 0=none, 1=capture, 2=detect, 3=crop, 4=inference
-  ['step1','step2','step3','step4'].forEach((id,i)=>{
-    const el=$(id);
-    el.classList.remove('active','done');
-    if(i+1<step) el.classList.add('done');
-    else if(i+1===step) el.classList.add('active');
+function setPipelineStep(step) {
+  ['step1','step2','step3','step4'].forEach((id, i) => {
+    const el = $(id);
+    el.classList.remove('active', 'done');
+    if(i+1 < step) el.classList.add('done');
+    else if(i+1 === step) el.classList.add('active');
   });
 }
 
 /* ═══════════════════════════════════════════════════════════════
    CONTRIBUTE / UPLOAD
 ═══════════════════════════════════════════════════════════════ */
-async function submitContribution(){
-  const consent=$('consentBox').checked;
-  if(!consent) return;
-  if(uploadedCount<13){ toast('❌','Missing Videos','Please attach all 13 videos.',true); return; }
+async function submitContribution() {
+  if(!$('consentBox').checked) return;
+  if(uploadedCount < 13) { toast('❌', 'Missing Videos', 'Please attach all 13 videos.', true); return; }
 
-  const fn=$('fname').value.trim(), ln=$('lname').value.trim(), age=$('cAge').value;
-  const gender=$('cGender').value||'not-specified';
-  const region=$('cRegion').value.trim()||'unknown';
-  if(!fn||!ln||!age){ toast('❌','Missing Info','Please fill name and age group.',true); return; }
+  const fn = $('fname').value.trim(), ln = $('lname').value.trim(), age = $('cAge').value;
+  const gender = $('cGender').value || 'not-specified';
+  const region = $('cRegion').value.trim() || 'unknown';
+  if(!fn || !ln || !age) { toast('❌', 'Missing Info', 'Please fill name and age group.', true); return; }
 
-  const ts=Date.now().toString(36).toUpperCase();
-  const speakerId=`SPK_${fn[0].toUpperCase()}${ln[0].toUpperCase()}_${ts}`;
+  const ts = Date.now().toString(36).toUpperCase();
+  const speakerId = `SPK_${fn[0].toUpperCase()}${ln[0].toUpperCase()}_${ts}`;
 
-  const ov=$('uploadOverlay'), oSub=$('overlayStatus'), oFill=$('overlayFill');
+  const ov = $('uploadOverlay'), oSub = $('overlayStatus'), oFill = $('overlayFill');
   ov.classList.add('show');
 
-  const keys=Object.keys(uploadedFiles);
-  for(let i=0;i<keys.length;i++){
-    const wid=keys[i], word=WORDS.find(w=>w.id===wid);
-    const fname_v=`${word.code}_${speakerId}.mp4`;
-    oSub.textContent=`Uploading ${i+1}/13: "${word.tunisian}" → ${fname_v}`;
-    oFill.style.width=Math.round(((i+1)/13)*100)+'%';
-    // TODO: replace with actual Google Drive API call:
-    // const fd=new FormData();
-    // fd.append('file',uploadedFiles[wid],fname_v);
-    // fd.append('folderId','1BxTUNILip_Dataset_YJ2025_v1_ENIT_Secure');
-    // await fetch('https://your-backend/upload', {method:'POST',body:fd});
-    await new Promise(r=>setTimeout(r,350));
+  const keys = Object.keys(uploadedFiles);
+  for(let i = 0; i < keys.length; i++) {
+    const wid = keys[i], word = WORDS.find(w => w.id === wid);
+    const fname_v = `${word.code}_${speakerId}.mp4`;
+    oSub.textContent = `Uploading ${i+1}/13: "${word.tunisian}" → ${fname_v}`;
+    oFill.style.width = Math.round(((i+1)/13)*100) + '%';
+    await new Promise(r => setTimeout(r, 350));
   }
 
-  oSub.textContent='Saving metadata…';
-  await new Promise(r=>setTimeout(r,500));
-  oFill.style.width='100%';
-  await new Promise(r=>setTimeout(r,300));
+  oSub.textContent = 'Saving metadata…';
+  await new Promise(r => setTimeout(r, 500));
+  oFill.style.width = '100%';
+  await new Promise(r => setTimeout(r, 300));
   ov.classList.remove('show');
 
-  toast('🎉','Thank You!',`Contribution saved as ${speakerId}`);
+  toast('🎉', 'Thank You!', `Contribution saved as ${speakerId}`);
 
-  // Reset
-  ['fname','lname','cRegion'].forEach(id=>$(id).value='');
-  $('cAge').value=''; $('cGender').value=''; $('consentBox').checked=false;
-  Object.keys(uploadedFiles).forEach(k=>delete uploadedFiles[k]);
-  uploadedCount=0;
-  $('uploadCount').textContent='0'; $('uploadBar').style.width='0%'; $('uploadPct').textContent='0%';
-  oFill.style.width='0%';
-  WORDS.forEach(w=>{
-    const item=$(`vui_${w.id}`);
-    if(item){ item.classList.remove('done'); item.querySelector('.vui-status').textContent='📹'; }
+  ['fname','lname','cRegion'].forEach(id => $(id).value = '');
+  $('cAge').value = ''; $('cGender').value = ''; $('consentBox').checked = false;
+  Object.keys(uploadedFiles).forEach(k => delete uploadedFiles[k]);
+  uploadedCount = 0;
+  $('uploadCount').textContent = '0'; $('uploadBar').style.width = '0%'; $('uploadPct').textContent = '0%';
+  oFill.style.width = '0%';
+  WORDS.forEach(w => {
+    const item = $(`vui_${w.id}`);
+    if(item) { item.classList.remove('done'); item.querySelector('.vui-status').textContent = '📹'; }
   });
-  $('submitBtn').disabled=true;
+  $('submitBtn').disabled = true;
 }
 
 /* ═══════════════════════════════════════════════════════════════
    TOAST
 ═══════════════════════════════════════════════════════════════ */
 let _toastTimer;
-function toast(icon,title,msg,isErr=false){
-  $('toastIcon').textContent=icon;
-  $('toastTitle').textContent=title;
-  $('toastTitle').className=isErr?'bad':'ok';
-  $('toastMsg').textContent=msg;
-  const t=$('toast');
-  t.className='toast show'+(isErr?' err':'');
+function toast(icon, title, msg, isErr = false) {
+  $('toastIcon').textContent = icon;
+  $('toastTitle').textContent = title;
+  $('toastTitle').className = isErr ? 'bad' : 'ok';
+  $('toastMsg').textContent = msg;
+  const t = $('toast');
+  t.className = 'toast show' + (isErr ? ' err' : '');
   clearTimeout(_toastTimer);
-  _toastTimer=setTimeout(()=>t.classList.remove('show'),4800);
+  _toastTimer = setTimeout(() => t.classList.remove('show'), 4800);
 }
 </script>
 </body>
