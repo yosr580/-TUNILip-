@@ -1132,15 +1132,14 @@ class TemporalAttention extends tf.layers.Layer {
   }
 
   call(inputs) {
-    return tf.tidy(() => {
-      const x = Array.isArray(inputs) ? inputs[0] : inputs;
-      // W1, b1, W2 are tf.Variable — use .read() to get the tensor value
-      const h  = tf.tanh(tf.add(tf.matMul(x, this.W1.read()), this.b1.read()));
-      const sc = tf.squeeze(tf.matMul(h, this.W2.read()), [-1]);
-      const wt = tf.softmax(sc, 1);                // (batch, 8)
-      return tf.sum(tf.mul(x, tf.expandDims(wt, 2)), 1); // (batch, 256)
-    });
-  }
+  return tf.tidy(() => {
+    const x = Array.isArray(inputs) ? inputs[0] : inputs;
+    const h  = tf.tanh(tf.add(tf.matMul(x, this.W1.val), this.b1.val));
+    const sc = tf.squeeze(tf.matMul(h, this.W2.val), [-1]);
+    const wt = tf.softmax(sc, 1);
+    return tf.sum(tf.mul(x, tf.expandDims(wt, 2)), 1);
+  });
+}
 
   computeOutputShape(inputShape) {
     // Output: (batch, last_dim) — removes the time dimension
