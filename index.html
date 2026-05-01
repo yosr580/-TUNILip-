@@ -71,7 +71,6 @@ body {
 .orb3 { width:350px;height:350px;top:40%;left:50%;transform:translate(-50%,-50%);
   background:radial-gradient(circle,rgba(12,242,200,0.04) 0%,transparent 70%); }
 
-/* Fine grid */
 .grid-overlay {
   position: fixed; inset: 0; pointer-events: none; z-index: 0;
   background-image:
@@ -238,7 +237,6 @@ nav.solid { background: rgba(8,11,18,0.97); }
 }
 .btn-ghost:hover { border-color:var(--teal); color:var(--teal); transform:translateY(-4px); background:var(--teal-dim); }
 
-/* Stat bar */
 .hero-stats {
   display: flex; gap: 0; flex-wrap: wrap; justify-content: center;
   margin-top: 64px; animation: riseIn 1s var(--ease) 0.55s both;
@@ -260,7 +258,6 @@ nav.solid { background: rgba(8,11,18,0.97); }
   margin-top: 6px; text-transform: uppercase; font-family: var(--mono);
 }
 
-/* Lip wave */
 .lip-wave {
   display: flex; gap: 5px; align-items: flex-end; justify-content: center;
   margin: 52px auto 0; height: 40px;
@@ -323,7 +320,6 @@ hr.divider { border:none; border-top:1px solid var(--border); }
 }
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
-.model-status-wrap { display:flex; align-items:center; gap:14px; }
 .model-status-dot {
   width:12px;height:12px;border-radius:50%;background:var(--ink3);flex-shrink:0;
   transition:background 0.4s;
@@ -332,7 +328,7 @@ hr.divider { border:none; border-top:1px solid var(--border); }
 .model-status-dot.error  { background:var(--red); }
 .model-status-dot.loading{ background:var(--amber); animation:livePulse 0.8s infinite; }
 
-.model-status-info {}
+.model-status-wrap { display:flex; align-items:center; gap:14px; }
 .model-status-label {
   font-family: var(--mono); font-size: 0.78rem; color: var(--ink2);
   letter-spacing: 0.05em;
@@ -1101,48 +1097,40 @@ const $ = id => document.getElementById(id);
 
 /* ═══════════════════════════════════════════════════════════════
    CUSTOM LAYER — TemporalAttention
-   Weight names MUST match model.json weightsManifest exactly:
-     attention/dense_16/kernel  [256, 64]
-     attention/dense_16/bias    [64]
-     attention/dense_17/kernel  [64, 1]
-   These are loaded from group1-shard1of1.bin automatically.
+   ─────────────────────────────────────────────────────────────
+   FIX: TF.js LayerVariable exposes the underlying tensor via
+        .val  (NOT .read() which doesn't exist in TF.js)
 ═══════════════════════════════════════════════════════════════ */
 class TemporalAttention extends tf.layers.Layer {
   constructor(config) {
-    super(config);
+    super(config || {});
     this.units = (config && config.units) ? config.units : 64;
   }
 
   build(inputShape) {
     const D = inputShape[inputShape.length - 1]; // 256 (BiLSTM output)
-    // These names must match "attention/dense_16/kernel" etc. in model.json
-    this.W1 = this.addWeight(
-      'dense_16/kernel', [D, this.units], 'float32',
-      tf.initializers.glorotUniform()
-    );
-    this.b1 = this.addWeight(
-      'dense_16/bias', [this.units], 'float32',
-      tf.initializers.zeros()
-    );
-    this.W2 = this.addWeight(
-      'dense_17/kernel', [this.units, 1], 'float32',
-      tf.initializers.glorotUniform()
-    );
+    this.W1 = this.addWeight('dense_16/kernel', [D, this.units], 'float32', tf.initializers.glorotUniform());
+    this.b1 = this.addWeight('dense_16/bias',   [this.units],    'float32', tf.initializers.zeros());
+    this.W2 = this.addWeight('dense_17/kernel', [this.units, 1], 'float32', tf.initializers.glorotUniform());
     this.built = true;
   }
 
   call(inputs) {
-  return tf.tidy(() => {
-    const x = Array.isArray(inputs) ? inputs[0] : inputs;
-    const h  = tf.tanh(tf.add(tf.matMul(x, this.W1.val), this.b1.val));
-    const sc = tf.squeeze(tf.matMul(h, this.W2.val), [-1]);
-    const wt = tf.softmax(sc, 1);
-    return tf.sum(tf.mul(x, tf.expandDims(wt, 2)), 1);
-  });
-}
+    return tf.tidy(() => {
+      const x = Array.isArray(inputs) ? inputs[0] : inputs;
+      // ✅ FIX: Use .val to get the tensor from a TF.js LayerVariable
+      //    (.read() does not exist in TF.js — that's a Python/TF API)
+      const W1 = (this.W1.val !== undefined) ? this.W1.val : this.W1;
+      const b1 = (this.b1.val !== undefined) ? this.b1.val : this.b1;
+      const W2 = (this.W2.val !== undefined) ? this.W2.val : this.W2;
+      const h  = tf.tanh(tf.add(tf.matMul(x, W1), b1));
+      const sc = tf.squeeze(tf.matMul(h, W2), [-1]);
+      const wt = tf.softmax(sc, 1);
+      return tf.sum(tf.mul(x, tf.expandDims(wt, 2)), 1);
+    });
+  }
 
   computeOutputShape(inputShape) {
-    // Output: (batch, last_dim) — removes the time dimension
     return [inputShape[0], inputShape[inputShape.length - 1]];
   }
 
@@ -1156,24 +1144,39 @@ class TemporalAttention extends tf.layers.Layer {
 // Register BEFORE tf.loadLayersModel is called
 tf.serialization.registerClass(TemporalAttention);
 
-/* ═══════════════════════════════════════════════════════════════
-   MODEL URL
-   ─────────────────────────────────────────────────────────────
-   Using a RELATIVE path so it works on ANY domain/deployment.
-   The model/ folder must sit alongside index.html in your repo.
-   Your repo already has:
-     model/model.json              ✓
-     model/group1-shard1of1.bin    ✓
-   vercel.json already adds the correct CORS headers.          ✓
-═══════════════════════════════════════════════════════════════ */
 const MODEL_URL = './model/model.json';
 
+/* ═══════════════════════════════════════════════════════════════
+   MODEL LOADER — with pre-flight and verbose error reporting
+═══════════════════════════════════════════════════════════════ */
 async function autoLoadModel() {
   setModelStatus('loading', 'Loading model weights…', 'Fetching ./model/model.json · 2.5 MB weights');
+
+  // ── Pre-flight: verify both files are reachable ──────────────
+  try {
+    const rj = await fetch('./model/model.json').catch(e => ({ ok: false, status: 'FETCH_ERR: ' + e.message }));
+    const rb = await fetch('./model/group1-shard1of1.bin').catch(e => ({ ok: false, status: 'FETCH_ERR: ' + e.message }));
+    const binLen = rb.headers && rb.headers.get ? rb.headers.get('content-length') : '?';
+    console.log('[TUNILip+] pre-flight model.json →', rj.status, '| .bin →', rb.status, '| content-length:', binLen);
+
+    if (!rj.ok) throw new Error('model.json not reachable: HTTP ' + rj.status);
+    if (!rb.ok) throw new Error('group1-shard1of1.bin not reachable: HTTP ' + rb.status);
+    if (binLen && binLen !== '?' && Math.abs(parseInt(binLen) - 2574900) > 500) {
+      console.warn('[TUNILip+] .bin size mismatch! Got', binLen, 'bytes, expected 2574900 — possible Git LFS pointer');
+      setModelStatus('loading', 'Loading model weights…', `⚠ .bin size: ${binLen} (expected 2574900) — may be LFS pointer`);
+    }
+  } catch(preErr) {
+    console.error('[TUNILip+] Pre-flight failed:', preErr);
+    setModelStatus('error', '⚠ Model files unreachable', preErr.message.slice(0, 100));
+    $('modelMeta').textContent = '● DEMO MODE';
+    return;
+  }
+
+  // ── Load model ───────────────────────────────────────────────
   try {
     S.model = await tf.loadLayersModel(MODEL_URL);
 
-    // Warm-up pass — input shape is (batch=1, tokens=8, dims=768)
+    // Warm-up pass
     const dummy  = tf.zeros([1, 8, 768]);
     const warmup = S.model.predict(dummy);
     warmup.dispose();
@@ -1188,13 +1191,11 @@ async function autoLoadModel() {
     $('modelMeta').textContent = '● LIVE INFERENCE';
     toast('✅', 'Model Ready', 'vmae_bilstm loaded — real inference enabled');
   } catch(err) {
-    console.error('[TUNILip+] Model load error:', err);
-    setModelStatus(
-      'error',
-      '⚠ Model unavailable — running in demo mode',
-      'Check browser console · ensure model/ folder is deployed correctly'
-    );
+    const msg = (err && err.message) ? err.message : String(err);
+    console.error('[TUNILip+] tf.loadLayersModel error:', err);
+    setModelStatus('error', '⚠ Model load failed — demo mode', msg.slice(0, 100));
     $('modelMeta').textContent = '● DEMO MODE';
+    toast('❌', 'Model Error', msg.slice(0, 80), true);
   }
 }
 
@@ -1535,8 +1536,6 @@ async function runPrediction() {
   let scores;
   if(S.model) {
     try {
-      // Build deterministic (1,8,768) feature tensor seeded from file size
-      // so the same video gives a consistent result in the browser demo.
       const seed = (S.videoBlob.size || 12345) % 10000;
       const data = new Float32Array(8 * 768);
       for(let i = 0; i < data.length; i++) {
@@ -1619,7 +1618,7 @@ function displayPrediction(scores) {
 }
 
 function resetPredUI() {
-  ['predWord','predArabic','predEnglish','predConf'].forEach(id => $( id ).classList.remove('show'));
+  ['predWord','predArabic','predEnglish','predConf'].forEach(id => $(id).classList.remove('show'));
   $('predBox').classList.remove('result');
   $('predEmpty').style.display = 'block';
   $('predEmpty').textContent = 'Awaiting video input...';
