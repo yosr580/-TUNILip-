@@ -1688,15 +1688,20 @@ async function runPrediction() {
     setPipelineStep(3);
     $('predEmpty').textContent = '🧠 VideoMAE feature extraction (server)…';
 
+    // Utilise FormData (multipart) au lieu de JSON
+    // → évite le preflight CORS OPTIONS bloqué par HuggingFace Spaces
+    const formData = new FormData();
+    formData.append('frames_json', JSON.stringify(frames));
+
     const resp = await fetch(`${BACKEND_URL}/extract-features-frames`, {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ frames }),
+      body: formData,   // pas de Content-Type header manuel → browser gère le boundary
     });
 
     if (!resp.ok) {
-      const err = await resp.json();
-      throw new Error(err.detail || `HTTP ${resp.status}`);
+      let detail = `HTTP ${resp.status}`;
+      try { const e = await resp.json(); detail = e.detail || detail; } catch(_) {}
+      throw new Error(detail);
     }
 
     const data = await resp.json();
