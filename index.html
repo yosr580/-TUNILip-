@@ -1514,14 +1514,16 @@ function resetDemo() {
    PREDICTION ENGINE
 ═══════════════════════════════════════════════════════════════ */
 /* ═══════════════════════════════════════════════════════════════
-   MOUTH CROP EXTRACTION
-   Reproduit exactement ce que le dataset Kaggle contenait :
-   vidéo déjà croppée sur la bouche.
-   On extrait 16 frames, on crop la bouche via FaceMesh,
-   on envoie les frames croppées (224×224) au backend.
+   MOUTH CROP EXTRACTION — version fiable sans FaceMesh async
+   Stratégie :
+     1. Extraire 16 frames de la vidéo
+     2. Sur la 1ère frame, détecter la bouche avec une nouvelle
+        instance FaceMesh dédiée (synchrone, sans conflit)
+     3. Appliquer le même crop sur toutes les frames
+     4. Fallback : crop centre-bas du visage si pas de détection
 ═══════════════════════════════════════════════════════════════ */
 
-// Indices landmarks bouche (MediaPipe 468 points)
+// Indices landmarks bouche MediaPipe
 const MOUTH_LM = [
   61,146,91,181,84,17,314,405,321,375,291,308,
   324,318,402,317,14,87,178,88,95,185,40,39,
@@ -1529,110 +1531,132 @@ const MOUTH_LM = [
   81,42,183,78
 ];
 
-async function extractMouthFrames(videoBlob, numFrames = 16) {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(videoBlob);
-    const vid  = document.createElement('video');
-    vid.src = url;
-    vid.muted = true;
-    vid.playsInline = true;
+// Détecte les coordonnées de la bouche sur un canvas
+// Retourne {sx, sy, sw, sh} en pixels ou null si pas de visage
+async function detectMouthBox(canvas) {
+  return new Promise(resolve => {
+    try {
+      const fm = new FaceMesh({
+        locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`
+      });
+      fm.setOptions({
+        maxNumFaces: 1,
+        refineLandmarks: false,
+        minDetectionConfidence: 0.3,
+        minTrackingConfidence: 0.3,
+      });
 
-    vid.onloadedmetadata = async () => {
-      const duration = vid.duration;
-      const offscreen = document.createElement('canvas');
-      offscreen.width  = vid.videoWidth  || 640;
-      offscreen.height = vid.videoHeight || 480;
-      const ctx = offscreen.getContext('2d');
+      const W = canvas.width, H = canvas.height;
+      let resolved = false;
 
-      // Canvas de sortie : 224×224 pour VideoMAE
-      const mouthCanvas = document.createElement('canvas');
-      mouthCanvas.width  = 224;
-      mouthCanvas.height = 224;
-      const mCtx = mouthCanvas.getContext('2d');
+      fm.onResults = (results) => {
+        if (resolved) return;
+        resolved = true;
+        fm.close();
 
-      const frames = [];
-      const timestamps = Array.from({length: numFrames}, (_, i) =>
-        (i / (numFrames - 1)) * duration
-      );
-
-      for (const t of timestamps) {
-        // Seek to timestamp
-        await new Promise(r => {
-          vid.currentTime = t;
-          vid.onseeked = r;
-        });
-
-        // Dessine la frame entière
-        ctx.drawImage(vid, 0, 0, offscreen.width, offscreen.height);
-
-        // Détecte la bouche via FaceMesh si disponible
-        let mouthBase64;
-        if (S.faceMesh) {
-          try {
-            let detected = false;
-            const origCb = S.faceMesh.onResults.bind(S.faceMesh);
-
-            await new Promise(r => {
-              S.faceMesh.onResults = (results) => {
-                if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
-                  const lms = results.multiFaceLandmarks[0];
-                  const W = offscreen.width, H = offscreen.height;
-
-                  let minX=1, minY=1, maxX=0, maxY=0;
-                  MOUTH_LM.forEach(idx => {
-                    const lm = lms[idx];
-                    minX = Math.min(minX, lm.x); maxX = Math.max(maxX, lm.x);
-                    minY = Math.min(minY, lm.y); maxY = Math.max(maxY, lm.y);
-                  });
-
-                  // Padding identique à l'entraînement
-                  const padX = (maxX - minX) * 0.18;
-                  const padY = (maxY - minY) * 0.25;
-                  const sx = Math.max(0, minX - padX) * W;
-                  const sy = Math.max(0, minY - padY) * H;
-                  const sw = (Math.min(1, maxX + padX) - Math.max(0, minX - padX)) * W;
-                  const sh = (Math.min(1, maxY + padY) - Math.max(0, minY - padY)) * H;
-
-                  mCtx.drawImage(offscreen, sx, sy, sw, sh, 0, 0, 224, 224);
-                  detected = true;
-                } else {
-                  // Pas de visage détecté → frame entière centrée
-                  mCtx.drawImage(offscreen, 0, 0, 224, 224);
-                }
-                r();
-              };
-              S.faceMesh.send({image: offscreen});
-            });
-
-            // Restaure le callback original
-            S.faceMesh.onResults(onFaceMeshResults);
-
-          } catch(e) {
-            // Fallback : frame entière
-            mCtx.drawImage(offscreen, 0, 0, 224, 224);
-          }
-        } else {
-          // Pas de FaceMesh → frame entière
-          mCtx.drawImage(offscreen, 0, 0, 224, 224);
+        if (!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0) {
+          resolve(null);
+          return;
         }
+        const lms = results.multiFaceLandmarks[0];
+        let minX=1, minY=1, maxX=0, maxY=0;
+        MOUTH_LM.forEach(idx => {
+          const lm = lms[idx];
+          minX = Math.min(minX, lm.x); maxX = Math.max(maxX, lm.x);
+          minY = Math.min(minY, lm.y); maxY = Math.max(maxY, lm.y);
+        });
+        const padX = (maxX - minX) * 0.18;
+        const padY = (maxY - minY) * 0.25;
+        resolve({
+          sx: Math.max(0, minX - padX) * W,
+          sy: Math.max(0, minY - padY) * H,
+          sw: (Math.min(1, maxX + padX) - Math.max(0, minX - padX)) * W,
+          sh: (Math.min(1, maxY + padY) - Math.max(0, minY - padY)) * H,
+        });
+      };
 
-        // Encode en base64 JPEG (qualité 0.85)
-        mouthBase64 = mouthCanvas.toDataURL('image/jpeg', 0.85).split(',')[1];
-        frames.push(mouthBase64);
-      }
+      // Timeout de sécurité : 3 secondes
+      setTimeout(() => {
+        if (!resolved) { resolved = true; fm.close(); resolve(null); }
+      }, 3000);
 
-      URL.revokeObjectURL(url);
-      vid.remove();
-      resolve(frames);
-    };
+      fm.send({ image: canvas });
+    } catch(e) {
+      resolve(null);
+    }
+  });
+}
 
-    vid.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error('Impossible de lire la vidéo'));
-    };
+async function extractMouthFrames(videoBlob, numFrames = 16) {
+  const url = URL.createObjectURL(videoBlob);
+  const vid  = document.createElement('video');
+  vid.src = url;
+  vid.muted = true;
+  vid.playsInline = true;
+  vid.crossOrigin = 'anonymous';
 
+  // Attendre que les métadonnées soient chargées
+  await new Promise((res, rej) => {
+    vid.onloadedmetadata = res;
+    vid.onerror = () => rej(new Error('Vidéo illisible'));
     vid.load();
   });
+
+  const duration = vid.duration;
+  const W = vid.videoWidth  || 640;
+  const H = vid.videoHeight || 480;
+
+  const frameCanvas = document.createElement('canvas');
+  frameCanvas.width = W; frameCanvas.height = H;
+  const fCtx = frameCanvas.getContext('2d');
+
+  const outCanvas = document.createElement('canvas');
+  outCanvas.width = 224; outCanvas.height = 224;
+  const oCtx = outCanvas.getContext('2d');
+
+  // ── 1. Extraire la 1ère frame pour détecter la bouche ──
+  vid.currentTime = duration * 0.2;  // à 20% de la vidéo
+  await new Promise(r => { vid.onseeked = r; });
+  fCtx.drawImage(vid, 0, 0, W, H);
+
+  // ── 2. Détecter la bouche ──
+  $('predEmpty').textContent = '👄 Detecting mouth position…';
+  let box = await detectMouthBox(frameCanvas);
+
+  if (!box) {
+    // Fallback : tiers inférieur central du visage (position typique de la bouche)
+    console.warn('[TUNILip+] No face detected, using center-bottom crop');
+    box = {
+      sx: W * 0.25,
+      sy: H * 0.55,
+      sw: W * 0.50,
+      sh: H * 0.30,
+    };
+  }
+
+  console.log('[TUNILip+] Mouth box:', box);
+
+  // ── 3. Extraire les 16 frames avec ce crop ──
+  const frames = [];
+  const timestamps = Array.from({length: numFrames}, (_, i) =>
+    numFrames === 1 ? duration * 0.5 : (i / (numFrames - 1)) * duration
+  );
+
+  for (let i = 0; i < timestamps.length; i++) {
+    vid.currentTime = Math.min(timestamps[i], duration - 0.01);
+    await new Promise(r => { vid.onseeked = r; });
+    fCtx.drawImage(vid, 0, 0, W, H);
+
+    // Crop bouche → 224×224
+    oCtx.drawImage(frameCanvas, box.sx, box.sy, box.sw, box.sh, 0, 0, 224, 224);
+
+    const b64 = outCanvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+    frames.push(b64);
+  }
+
+  URL.revokeObjectURL(url);
+  vid.remove();
+  return frames;
 }
 
 async function runPrediction() {
