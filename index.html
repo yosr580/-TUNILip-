@@ -1055,7 +1055,7 @@ footer {
 <script>
 'use strict';
    // ═══ URL du backend Render — à changer après déploiement ═══
-const BACKEND_URL = 'https://yossss2-tunilip-backend.hf.space';
+const BACKEND_URL = 'https://tunilip-backend.onrender.com';
 
 /* ─── VOCABULARY DATA ───────────────────────────────────────── */
 const WORDS = [
@@ -1513,6 +1513,128 @@ function resetDemo() {
 /* ═══════════════════════════════════════════════════════════════
    PREDICTION ENGINE
 ═══════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   MOUTH CROP EXTRACTION
+   Reproduit exactement ce que le dataset Kaggle contenait :
+   vidéo déjà croppée sur la bouche.
+   On extrait 16 frames, on crop la bouche via FaceMesh,
+   on envoie les frames croppées (224×224) au backend.
+═══════════════════════════════════════════════════════════════ */
+
+// Indices landmarks bouche (MediaPipe 468 points)
+const MOUTH_LM = [
+  61,146,91,181,84,17,314,405,321,375,291,308,
+  324,318,402,317,14,87,178,88,95,185,40,39,
+  37,0,267,269,270,409,415,310,311,312,13,82,
+  81,42,183,78
+];
+
+async function extractMouthFrames(videoBlob, numFrames = 16) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(videoBlob);
+    const vid  = document.createElement('video');
+    vid.src = url;
+    vid.muted = true;
+    vid.playsInline = true;
+
+    vid.onloadedmetadata = async () => {
+      const duration = vid.duration;
+      const offscreen = document.createElement('canvas');
+      offscreen.width  = vid.videoWidth  || 640;
+      offscreen.height = vid.videoHeight || 480;
+      const ctx = offscreen.getContext('2d');
+
+      // Canvas de sortie : 224×224 pour VideoMAE
+      const mouthCanvas = document.createElement('canvas');
+      mouthCanvas.width  = 224;
+      mouthCanvas.height = 224;
+      const mCtx = mouthCanvas.getContext('2d');
+
+      const frames = [];
+      const timestamps = Array.from({length: numFrames}, (_, i) =>
+        (i / (numFrames - 1)) * duration
+      );
+
+      for (const t of timestamps) {
+        // Seek to timestamp
+        await new Promise(r => {
+          vid.currentTime = t;
+          vid.onseeked = r;
+        });
+
+        // Dessine la frame entière
+        ctx.drawImage(vid, 0, 0, offscreen.width, offscreen.height);
+
+        // Détecte la bouche via FaceMesh si disponible
+        let mouthBase64;
+        if (S.faceMesh) {
+          try {
+            let detected = false;
+            const origCb = S.faceMesh.onResults.bind(S.faceMesh);
+
+            await new Promise(r => {
+              S.faceMesh.onResults = (results) => {
+                if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
+                  const lms = results.multiFaceLandmarks[0];
+                  const W = offscreen.width, H = offscreen.height;
+
+                  let minX=1, minY=1, maxX=0, maxY=0;
+                  MOUTH_LM.forEach(idx => {
+                    const lm = lms[idx];
+                    minX = Math.min(minX, lm.x); maxX = Math.max(maxX, lm.x);
+                    minY = Math.min(minY, lm.y); maxY = Math.max(maxY, lm.y);
+                  });
+
+                  // Padding identique à l'entraînement
+                  const padX = (maxX - minX) * 0.18;
+                  const padY = (maxY - minY) * 0.25;
+                  const sx = Math.max(0, minX - padX) * W;
+                  const sy = Math.max(0, minY - padY) * H;
+                  const sw = (Math.min(1, maxX + padX) - Math.max(0, minX - padX)) * W;
+                  const sh = (Math.min(1, maxY + padY) - Math.max(0, minY - padY)) * H;
+
+                  mCtx.drawImage(offscreen, sx, sy, sw, sh, 0, 0, 224, 224);
+                  detected = true;
+                } else {
+                  // Pas de visage détecté → frame entière centrée
+                  mCtx.drawImage(offscreen, 0, 0, 224, 224);
+                }
+                r();
+              };
+              S.faceMesh.send({image: offscreen});
+            });
+
+            // Restaure le callback original
+            S.faceMesh.onResults(onFaceMeshResults);
+
+          } catch(e) {
+            // Fallback : frame entière
+            mCtx.drawImage(offscreen, 0, 0, 224, 224);
+          }
+        } else {
+          // Pas de FaceMesh → frame entière
+          mCtx.drawImage(offscreen, 0, 0, 224, 224);
+        }
+
+        // Encode en base64 JPEG (qualité 0.85)
+        mouthBase64 = mouthCanvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+        frames.push(mouthBase64);
+      }
+
+      URL.revokeObjectURL(url);
+      vid.remove();
+      resolve(frames);
+    };
+
+    vid.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('Impossible de lire la vidéo'));
+    };
+
+    vid.load();
+  });
+}
+
 async function runPrediction() {
   if (!S.videoBlob) {
     toast('⚠️', 'No Video', 'Please upload or record a video first.', true);
@@ -1520,20 +1642,32 @@ async function runPrediction() {
   }
   resetPredUI();
   setPipelineStep(1);
-  $('predEmpty').textContent = '⚙️ Uploading video to server…';
+  $('predEmpty').textContent = '⚙️ Reading video…';
 
-  // ── Étape 1 : envoyer la vidéo → backend → features (8, 768) ──
-  let features;
+  // ── Étape 1 : extraire les frames croppées sur la bouche ──
+  let frames;
   try {
     setPipelineStep(2);
-    $('predEmpty').textContent = '👄 Extracting VideoMAE features (server)…';
+    $('predEmpty').textContent = '👄 Cropping mouth region (16 frames)…';
+    frames = await extractMouthFrames(S.videoBlob, 16);
+    console.log(`[TUNILip+] ${frames.length} mouth frames extracted (224×224 JPEG)`);
+  } catch(err) {
+    toast('❌', 'Extraction Error', err.message, true);
+    $('predEmpty').textContent = '⚠️ ' + err.message;
+    setPipelineStep(0);
+    return;
+  }
 
-    const formData = new FormData();
-    formData.append('video', S.videoBlob, 'input.mp4');
+  // ── Étape 2 : envoyer les frames au backend → features (8, 768) ──
+  let features;
+  try {
+    setPipelineStep(3);
+    $('predEmpty').textContent = '🧠 VideoMAE feature extraction (server)…';
 
-    const resp = await fetch(`${BACKEND_URL}/extract-features`, {
+    const resp = await fetch(`${BACKEND_URL}/extract-features-frames`, {
       method: 'POST',
-      body: formData,
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ frames }),
     });
 
     if (!resp.ok) {
@@ -1542,34 +1676,31 @@ async function runPrediction() {
     }
 
     const data = await resp.json();
-    features = data.features; // [[f0_0,...,f0_767], ..., [f7_0,...,f7_767]]
+    features = data.features;
+    console.log('[TUNILip+] Features received — shape:', data.shape);
 
-  } catch (err) {
+  } catch(err) {
     toast('❌', 'Backend Error', err.message, true);
-    $('predEmpty').textContent = '⚠️ Erreur backend : ' + err.message;
+    $('predEmpty').textContent = '⚠️ Backend : ' + err.message;
     setPipelineStep(0);
     return;
   }
 
-  // ── Étape 2 : inférence TF.js avec les vraies features ──
-  setPipelineStep(3);
-  $('predEmpty').textContent = '🔢 Preparing tensor (8×768)…';
-  await delay(200);
-
+  // ── Étape 3 : inférence TF.js ──
   setPipelineStep(4);
-  $('predEmpty').textContent = '🧠 Running BiLSTM + TemporalAttention…';
+  $('predEmpty').textContent = '⚡ BiLSTM + TemporalAttention inference…';
 
   let scores;
   if (S.model) {
     try {
-      const flat = features.flat();              // 8×768 = 6144 valeurs
+      const flat = features.flat();
       const inp  = tf.tensor3d(flat, [1, 8, 768]);
       const out  = S.model.predict(inp);
       const raw  = await out.data();
       inp.dispose();
       out.dispose();
       scores = Array.from(raw).map((v, i) => ({ idx: i, prob: v }));
-    } catch (err) {
+    } catch(err) {
       console.error('[TUNILip+] Inference error:', err);
       scores = simulateScores();
     }
